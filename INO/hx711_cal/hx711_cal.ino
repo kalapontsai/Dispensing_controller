@@ -10,9 +10,9 @@
 #include "HX711.h"
 
 // HX711 接線設定
-const int DT_PIN = 6;
-const int SCK_PIN = 5;
-const int sample_weight = 67;  //基準物品的真實重量(公克)
+const int DT_PIN = 12;
+const int SCK_PIN = 14;
+const int sample_weight = 64.8;  //基準物品的真實重量(公克)
 // use Product 99D (2x2 case) for sample, scale factor is 1963
 
 HX711 scale;
