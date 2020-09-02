@@ -7,7 +7,8 @@ LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars
 const int BUTTON = 13; //啟動重量比對和灌膠relay
 const int TUNNER = A0;
 const int RELAY = 15;
-const int scale_factor = 1979; //比例參數，從校正程式中取得
+const int scale_factor = 1975; //比例參數，從校正程式中取得
+int OFFSET = 1; //補正值
 
 HX711 scale;
 
@@ -39,17 +40,18 @@ void setup() {
 
 void loop() {
   boolean buttonState = digitalRead(BUTTON);
-  Serial.print(buttonState);
-  if (buttonState == LOW) {
-    Serial.println(" ** Button Active **");
-    }
+  Serial.print("Button state : ");
+  Serial.println(buttonState);
+  //if (buttonState == LOW) {
+  //  Serial.println(" ** Button Active **");
+  //  }
   int TuneValue = analogRead(TUNNER);
-  float weight = scale.get_units(10);
+  float weight = scale.get_units(3) + OFFSET;
   //避免出現負數
-  if(weight<=0){
+  if(weight <= OFFSET){
     weight = 0;
   }
-  int SetValue = map(TuneValue,10,1023,0,100);
+  int SetValue = map(TuneValue,10,1023,0,80);
   if(SetValue < 0) {
     SetValue = 0;
     }
@@ -68,6 +70,8 @@ void loop() {
   Serial.print(TuneValue);
   Serial.print(" / ");
   Serial.println(SetValue);
+  Serial.print("Weight : ");
+  Serial.println(weight);
   lcd.setCursor(9, 0);
   lcd.print(weight,1);
   lcd.setCursor(6, 1);
@@ -82,6 +86,6 @@ void loop() {
   }
 
   //scale.power_down();             // 進入睡眠模式
-  delay(500);
+  //delay(500);
   //scale.power_up();               // 結束睡眠模式
 }
