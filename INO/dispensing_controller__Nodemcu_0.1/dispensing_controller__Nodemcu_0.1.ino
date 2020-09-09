@@ -36,46 +36,54 @@ void setup() {
 
   digitalWrite(RELAY, LOW);
   digitalWrite(LED_BUILTIN, HIGH); // LED OFF
+  lcd.clear();
+  lcd.setCursor(0, 0);  //設定游標位置 (字,行)
+  lcd.print("Weight: ");
+  lcd.setCursor(13, 0);
+  lcd.print("g");
+  lcd.setCursor(3, 1);  //設定游標位置 (字,行)
+  lcd.print("SET : ");
+  lcd.setCursor(13, 1);  //設定游標位置 (字,行)
+  lcd.print("g");
 }
 
 void loop() {
   boolean buttonState = digitalRead(BUTTON);
   Serial.print("Button state : ");
   Serial.println(buttonState);
-  //if (buttonState == LOW) {
-  //  Serial.println(" ** Button Active **");
-  //  }
-  int TuneValue = analogRead(TUNNER);
+
   float weight = scale.get_units(3) + OFFSET;
   //避免出現負數
   if(weight <= OFFSET){
     weight = 0;
   }
-  int SetValue = map(TuneValue,10,1023,0,80);
-  if(SetValue < 0) {
-    SetValue = 0;
-    }
-  // Serial.println(scale.get_units(10), 1); 
-  lcd.clear();
-  lcd.setCursor(0, 0);  //設定游標位置 (字,行)
-  lcd.print("Weight: ");
-  lcd.setCursor(14, 0);
-  lcd.print("g");
-  lcd.setCursor(0, 1);  //設定游標位置 (字,行)
-  lcd.print("SET : ");
-  lcd.setCursor(10, 1);  //設定游標位置 (字,行)
-  lcd.print("g");
-
+  int TuneValue = analogRead(TUNNER);
+  float SetValue = (map(TuneValue,10,1023,1,800)/10.0); //讓插入值為小數一位 
   Serial.print("TuneValue / SetValue = ");
   Serial.print(TuneValue);
   Serial.print(" / ");
   Serial.println(SetValue);
   Serial.print("Weight : ");
   Serial.println(weight);
-  lcd.setCursor(9, 0);
+
+  if (String(weight,1).length() <= 3) {
+    lcd.setCursor(9,0);
+    lcd.print(" ");
+    lcd.setCursor(10, 0);
+    }
+  else {
+    lcd.setCursor(9, 0);
+    }
   lcd.print(weight,1);
-  lcd.setCursor(6, 1);
-  lcd.print(SetValue);
+  if (String(SetValue,1).length() <= 3) {
+    lcd.setCursor(9,1);
+    lcd.print(" ");
+    lcd.setCursor(10, 1);
+    }
+  else {
+    lcd.setCursor(9, 1);
+    }
+  lcd.print(SetValue,1);
   if ((buttonState == LOW) && (SetValue > weight)) {
     digitalWrite(RELAY, HIGH);
     digitalWrite(LED_BUILTIN, LOW);
